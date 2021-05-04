@@ -9,6 +9,7 @@ class Object {
 private:
 	string name;
 	int age;
+	int homeNode;
 public:
 	Object(string x, int y){
 		name = x;
@@ -59,8 +60,8 @@ public:
 	}
 	void addObject(string x, int y){
 		int chain = 0;
-		if ((size / capacity) >= 0.6) {
-			reHash(x, y);
+		if ((size / capacity) >= 0.6) {		
+			reHash(x);
 		}
 		int index = asciiHash(x);
 		//int index = djb2Hash(x);
@@ -136,9 +137,8 @@ public:
 		} 
 	}
 
-	void reHash(string x, int y){
+	void reHash(string x){
 		vector<Object*> tempArray;//are we suppose to use a temporrary array while moving the objects back into the original array?
-				//tempArray.resize(size);
 		for (int i = 0; i < capacity; i++) {
 			if (t[i] != nullptr) {
 				tempArray.push_back(t[i]);
@@ -154,10 +154,7 @@ public:
 
 			int index = asciiHash(x);
 			//int index = djb2Hash(x);
-			//for (int i = 0; i < name.size(); i++) {
-			//	temp = temp + int(name[i]);
-			//}
-			//int index = (temp) % capacity;
+			
 
 			if (t[index] == nullptr) {
 				t[index] = tempArray[i];
@@ -171,7 +168,6 @@ public:
 				}
 			}
 		}
-		addObject(x, y);
 	}
 
 	int asciiHash(string x) {
@@ -201,10 +197,44 @@ private:
 	int probe;
 	int collision;
 	int collisionChain;
+	int h;
 public:
 	HopScotchTable() {
-
+		h = 4;
 	};
+
+	void addObject(string x, int y){
+		int chain = 0;
+		if ((size / capacity) >= 0.6) {
+			reHash(x, y);
+		}
+		int index = asciiHash(x);
+
+		if(t[index] == nullptr){
+			Object* holder = new Object(x, y);
+			t[index] = holder; 
+			size++;
+		}
+		else {
+
+			bool foundPlace = false;
+			for (int i = index + 1; i < h + index; i++) {
+				if (t[i] == nullptr) {
+					Object* holder = new Object(x, y);
+					t[i] = holder;
+					size++;
+					foundPlace = true;
+					break;//breaks if it finds a slot
+				}
+				collision++;
+				chain++;
+				if (chain > collisionChain) {
+					collisionChain = chain;
+				}
+			}
+		}
+	}
+
 	int nextPrime(int currentPrime) {
 		currentPrime += currentPrime;
 		bool isPrime = false;
@@ -219,6 +249,26 @@ public:
 				return currentPrime;
 			currentPrime++;
 		}
+	}
+	void reHash(string x, int y) {
+		//bruh
+	}
+	int asciiHash(string x) {
+		int temp = 0;
+		for (int i = 0; i < x.size(); i++) {
+			temp = temp + int(x[i]);
+		}
+		int index = (temp) % capacity;//name -> ascii, name * age % size
+		return index;
+	}
+
+	int djb2Hash(string x){
+		unsigned long hash = 5381;
+		for (auto c : x) {
+			hash = (hash << 5) + hash + c; /* hash * 33 + c */
+		}
+		hash = hash % capacity;
+		return hash;
 	}
 
 	void displayTable() {
