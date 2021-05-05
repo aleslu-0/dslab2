@@ -5,6 +5,63 @@
 
 using namespace std;
 
+class Node {
+private:
+	Object *obj;
+	BitMap btm;
+public:
+	Node(){
+		obj = nullptr;
+	}
+	Node(Object *bj){
+		obj = bj;
+	}
+	Object getObj(){
+		return(*obj);
+	}
+	BitMap getBtm(){
+		return(btm);
+	}
+	void setObj(Object *o){
+		*obj = *o;
+	}
+	void setBtm(BitMap b){
+		btm = b;
+	}
+};
+
+class BitMap {
+private:
+	vector<bool> bits;
+public:
+	BitMap() {
+		for (int i = 0; i < 4; i++) {
+			bits.push_back(0);
+		}		
+	}
+	void setElement(bool b, int p) {
+		bits[p] = b;
+	}
+	bool getElement(int i) {
+		return bits[i];
+	}
+	int getFirstTrue() {
+		for (int i = 0; i < 4; i++) {
+			if (bits[i]) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	bool getAllTrue() {
+		for (int i = 0; i < 4; i++) {
+			if(bits[i] == false)
+				return false;
+		}
+		return true;
+	}
+};
+
 class Object {
 private:
 	string name;
@@ -26,6 +83,12 @@ public:
 	}
 	void setAge(int x){
 		age = x;
+	}
+	int getHomeNode(){
+		return(homeNode);
+	}
+	void setHomeNode(int x){
+		homeNode = x;
 	}
 };
 
@@ -203,37 +266,64 @@ public:
 
 class HopScotchTable {
 private:
-	vector<Object*> t;
+	vector<Node*> t;
+	Object* o;
+	BitMap* b;
 	int capacity = t.capacity();
 	int size;
 	int probe;
 	int collision;
 	int collisionChain;
 	int h;
+	bool ascii;
 public:
-	HopScotchTable() {
+	HopScotchTable(int enc) {
 		h = 4;
-	};
+		size = 0;
+		probe = 0;
+		collision = 0;
+		collisionChain = 0;
+		capacity = t.capacity();
+		ascii = enc;
+		t.resize(11);
+		for (int i = 0; i < capacity; i++) {
+			Node* holder = new Node();
+			t[i] = holder;
+		}
+	}; //write logic to update the homenode to something shit i forgot
+
+	void update(BitMap *bit, bool b, int p){
+		bit->setElement(b, p);
+	}
 
 	void addObject(string x, int y){
+		Object* oHolder = new Object(x, y);
 		int chain = 0;
-		if ((size / capacity) >= 0.6) {
+		int index;
+		if ((float(size) / float(capacity)) >= float(0.6)) {
 			reHash(x, y);
 		}
-		int index = asciiHash(x);
+		if (ascii)
+			index = asciiHash(x);
+		else
+			index = djb2Hash(x);
 
+		bool foundPlace = false;
 		if(t[index] == nullptr){
-			Object* holder = new Object(x, y);
-			t[index] = holder; 
+			t[index]->setObj(oHolder);
+			oHolder->setHomeNode(chain);
+			t[index]->getBtm().setElement(1, chain);
 			size++;
 		}
+		
 		else {
-
-			bool foundPlace = false;
+			oHolder->setHomeNode(chain);
+			chain++;
+			
 			for (int i = index + 1; i < h + index; i++) {
 				if (t[i] == nullptr) {
-					Object* holder = new Object(x, y);
-					t[i] = holder;
+					t[index]->setObj(oHolder);
+					t[index]->getBtm().setElement(1, chain);
 					size++;
 					foundPlace = true;
 					break;//breaks if it finds a slot
@@ -244,7 +334,26 @@ public:
 					collisionChain = chain;
 				}
 			}
+			if(!foundPlace){
+				if(t[index].getBtm()->getAllTrue() == true){
+					reHash(x, y);
+				}
+				bool e = false;
+				for(int i = 0; i < h; i++){
+					if(oHolder->getHomeNode()->getBmt()->getElement(i) == true){
+						
+					}
+					else{
+						for(int x = 0; x < h; x++){
+							
+							t[index + i]->getBtm()->getElement(x) == 
+						}
+					}
+				}
+
+			}
 		}
+		
 	}
 
 	int nextPrime(int currentPrime) {
@@ -263,7 +372,10 @@ public:
 		}
 	}
 	void reHash(string x, int y) {
-		//bruh
+		for(int i = 0; i < capacity; i++){
+			Node* holder = new Node();
+			t[i] = holder;
+		}
 	}
 	int asciiHash(string x) {
 		int temp = 0;

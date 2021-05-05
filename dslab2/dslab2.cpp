@@ -5,7 +5,7 @@ using namespace std;
 using namespace std::chrono;
 
 void linear(int i) {
-    srand(time(NULL));
+    srand(time(0));
     LinearTable t(i);
     int flex = 0;
     high_resolution_clock::duration totalTime(0);
@@ -14,17 +14,17 @@ void linear(int i) {
     for (int i = 0; i < 10000; i++) {
         int randn = rand() % (1000 - 100) + 100; //numbers between 100 and 999
         string bruh = to_string(randn);
-        t.addObject(bruh, flex);
         flex = i;
+        t.addObject(bruh, flex);       
     }
 
     auto end = high_resolution_clock::now();
     totalTime = totalTime + (end - start);
 
     //t.displayTable(); //bruh, flex, iteration
-    cout << "-Using linear probing with " << t.getSize() << " items-";
-    cout << "\nNumber of collisions: " << t.getTotalCol() << "\n Length of longest collision chain: " << t.getColChain();
-    cout << "\nTotal time elapsed: " << totalTime.count() << "\n\n";
+    cout << "\n-Using linear probing with " << t.getSize() << " items-";
+    cout << "\nNumber of collisions: " << t.getTotalCol() << "\nLength of longest collision chain: " << t.getColChain();
+    cout << "\nTotal time elapsed: " << totalTime.count() << " nanoseconds\n\n";
     //cout << t.getSize() << " and " << t.getTableSize() << endl;
     //cout << t.getPercentage() << endl;
 }
