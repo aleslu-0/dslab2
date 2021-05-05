@@ -5,28 +5,33 @@
 
 using namespace std;
 
-class Node {
+class Object {
 private:
-	Object *obj;
-	BitMap btm;
+	string name;
+	int age;
+	int homeNode;
 public:
-	Node(){
-		obj = nullptr;
+	Object(string x, int y){
+		name = x;
+		age = y;
 	}
-	Node(Object *bj){
-		obj = bj;
+	string getName(){
+		return(name);
 	}
-	Object getObj(){
-		return(*obj);
+	int getAge(){
+		return(age);
 	}
-	BitMap getBtm(){
-		return(btm);
+	void setName(string x){
+		name = x;
 	}
-	void setObj(Object *o){
-		*obj = *o;
+	void setAge(int x){
+		age = x;
 	}
-	void setBtm(BitMap b){
-		btm = b;
+	int getHomeNode(){
+		return(homeNode);
+	}
+	void setHomeNode(int x){
+		homeNode = x;
 	}
 };
 
@@ -62,33 +67,28 @@ public:
 	}
 };
 
-class Object {
+class Node {
 private:
-	string name;
-	int age;
-	int homeNode;
+	Object* obj;
+	BitMap btm;
 public:
-	Object(string x, int y){
-		name = x;
-		age = y;
+	Node(){
+		obj = nullptr;
 	}
-	string getName(){
-		return(name);
+	Node(Object *bj){
+		obj = bj;
 	}
-	int getAge(){
-		return(age);
+	Object* getObj(){
+		return(obj);
 	}
-	void setName(string x){
-		name = x;
+	BitMap getBtm(){
+		return(btm);
 	}
-	void setAge(int x){
-		age = x;
+	void setObj(Object *o){
+		*obj = *o;
 	}
-	int getHomeNode(){
-		return(homeNode);
-	}
-	void setHomeNode(int x){
-		homeNode = x;
+	void setBtm(BitMap b){
+		btm = b;
 	}
 };
 
@@ -97,7 +97,6 @@ private:
 	vector<Object*> t;
 	int capacity = t.capacity();
 	int size;
-	int probe;
 	int collision;
 	int collisionChain;
 	bool ascii;
@@ -105,7 +104,6 @@ public:
 	LinearTable(int enc) {
 		t.resize(11);
 		size = 0;
-		probe = 0;
 		collision = 0;
 		collisionChain = 0;
 		capacity = t.capacity();
@@ -271,27 +269,37 @@ private:
 	BitMap* b;
 	int capacity = t.capacity();
 	int size;
-	int probe;
 	int collision;
 	int collisionChain;
 	int h;
 	bool ascii;
 public:
 	HopScotchTable(int enc) {
+		t.resize(11);
 		h = 4;
 		size = 0;
-		probe = 0;
 		collision = 0;
 		collisionChain = 0;
 		capacity = t.capacity();
 		ascii = enc;
-		t.resize(11);
 		for (int i = 0; i < capacity; i++) {
 			Node* holder = new Node();
 			t[i] = holder;
 		}
 	}; //write logic to update the homenode to something shit i forgot
 
+	int getTableSize() {
+		return capacity;
+	}
+	int getTotalCol() {
+		return collision;
+	}
+	int getColChain() {
+		return collisionChain;
+	}
+	int getSize() {
+		return size;
+	}
 	void update(BitMap *bit, bool b, int p){
 		bit->setElement(b, p);
 	}
@@ -299,7 +307,7 @@ public:
 	void addObject(string x, int y){
 		Object* oHolder = new Object(x, y);
 		int chain = 0;
-		int index;
+		int index = 0;
 		if ((float(size) / float(capacity)) >= float(0.6)) {
 			reHash(x, y);
 		}
@@ -321,8 +329,9 @@ public:
 			chain++;
 			
 			for (int i = index + 1; i < h + index; i++) {
+				//cout << "bitch " << i << " " << capacity;
 				if (t[i] == nullptr) {
-					t[index]->setObj(oHolder);
+					t[index]->setObj(oHolder);////////////////////////////////////////////////////////
 					t[index]->getBtm().setElement(1, chain);
 					size++;
 					foundPlace = true;
@@ -335,18 +344,20 @@ public:
 				}
 			}
 			if(!foundPlace){
-				if(t[index].getBtm()->getAllTrue() == true){
+				if(t[index]->getBtm().getAllTrue() == true){
 					reHash(x, y);
 				}
-				bool e = false;
 				for(int i = 0; i < h; i++){
-					if(oHolder->getHomeNode()->getBmt()->getElement(i) == true){
-						
-					}
-					else{
-						for(int x = 0; x < h; x++){
-							
-							t[index + i]->getBtm()->getElement(x) == 
+					if(t[index]->getBtm().getElement(i) == true){
+						if(t[index + i]== nullptr){
+							t[index]->setObj(oHolder);
+							t[index]->getBtm().setElement(1, chain);
+							size++;
+							break;
+						}
+						else{
+							addObject(t[index + i]->getObj()->getName(), t[index + i]->getObj()->getAge());
+							addObject(x, y);
 						}
 					}
 				}
@@ -372,11 +383,107 @@ public:
 		}
 	}
 	void reHash(string x, int y) {
-		for(int i = 0; i < capacity; i++){
+		vector<Node*> tempArray;//are we suppose to use a temporrary array while moving the objects back into the original array?
+		for (int i = 0; i < capacity; i++) {
+			if (t[i] != nullptr) {
+				tempArray.push_back(t[i]);
+				t[i] = nullptr;
+			}
+		}
+		t.resize(nextPrime(t.capacity()));
+		capacity = t.capacity();
+
+		for (int i = 0; i < capacity; i++) {
 			Node* holder = new Node();
 			t[i] = holder;
 		}
+
+		cout << "Rehashing gave new size: " << t.capacity() << endl;
+
+		for (int i = 0; i < tempArray.size(); i++) {
+			int index;
+
+			if(ascii)
+				index = asciiHash(x);
+			else
+				index = djb2Hash(x);
+			
+
+			if (t[index] == nullptr) {
+				t[index] = addObject(tempArray[i]->getObj());
+			}
+			else {
+				for (int b = index + 1; b < capacity; b++) {
+					if (t[b] == nullptr) {
+						t[b] = addObject(tempArray[i]->getObj());
+						break;
+					}
+				}
+			}
+		}
 	}
+
+	Node *addObject(Object* BABE){
+		int chain = 0;
+		int index;
+		if ((float(size) / float(capacity)) >= float(0.6)) {
+			reHash(BABE->getName(), BABE->getAge());
+		}
+		if (ascii)
+			index = asciiHash(BABE->getName());
+		else
+			index = djb2Hash(BABE->getName());
+
+		bool foundPlace = false;
+		if(t[index] == nullptr){
+			t[index]->setObj(BABE);
+			BABE->setHomeNode(chain);
+			t[index]->getBtm().setElement(1, chain);
+			size++;
+		}
+		
+		else {
+			BABE->setHomeNode(chain);
+			chain++;
+			
+			for (int i = index + 1; i < h + index; i++) {
+				if (t[i] == nullptr) {
+					t[index]->setObj(BABE);
+					t[index]->getBtm().setElement(1, chain);
+					size++;
+					foundPlace = true;
+					break;//breaks if it finds a slot
+				}
+				collision++;
+				chain++;
+				if (chain > collisionChain) {
+					collisionChain = chain;
+				}
+			}
+			if(!foundPlace){
+				if(t[index]->getBtm().getAllTrue() == true){
+					reHash(BABE->getName(), BABE->getAge());
+				}
+				for(int i = 0; i < h; i++){
+					if(t[index]->getBtm().getElement(i) == true){
+						if(t[index + i]== nullptr){
+							t[index]->setObj(BABE);
+							t[index]->getBtm().setElement(1, chain);
+							size++;
+							break;
+						}
+						else{
+							addObject(t[index + i]->getObj()->getName(), t[index + i]->getObj()->getAge());
+							addObject(BABE->getName(), BABE->getAge());
+						}
+					}
+				}
+
+			}
+		}
+		return t[index];
+	}
+
 	int asciiHash(string x) {
 		int temp = 0;
 		for (int i = 0; i < x.size(); i++) {
@@ -398,7 +505,7 @@ public:
 	void displayTable() {
 		for (int i = 0; i < t.capacity(); i++) {
 			if (t[i] != nullptr)
-				cout << t[i]->getName() << " " << t[i]->getAge() << " " << i << endl;
+				cout << t[i]->getObj()->getName() << " " << t[i]->getObj()->getAge() << " " << i << endl;
 		}
 	}
 };
