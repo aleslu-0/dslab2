@@ -37,8 +37,9 @@ private:
 	int probe;
 	int collision;
 	int collisionChain;
+	bool ascii;
 public:
-	LinearTable() {
+	LinearTable(int enc) {
 		t.resize(11);
 		size = 0;
 		probe = 0;
@@ -48,9 +49,13 @@ public:
 		for(int i = 0; i < 11; i++){
 			t[i] = nullptr;
 		}
+		ascii = enc;
 	};
+	bool getAscii() {
+		return ascii;
+	}
 	int getTableSize() {
-		return t.capacity();
+		return capacity;
 	}
 	int getTotalCol() {
 		return collision;
@@ -58,18 +63,22 @@ public:
 	int getColChain() {
 		return collisionChain;
 	}
+	int getSize() {
+		return size;
+	}
+	double getPercentage() {
+		return (float(size) / float(capacity));
+	}
 	void addObject(string x, int y){
 		int chain = 0;
-		if ((size / capacity) >= 0.6) {		
+		int index;
+		if ((float(size) / float(capacity)) >= float(0.6)) {		
 			reHash(x);
 		}
-		int index = asciiHash(x);
-		//int index = djb2Hash(x);
-		//int temp = 0;
-		//for(int i = 0; i < x.size(); i++){
-		//	temp = temp + int(x[i]);
-		//}
-		//int index = (temp) % capacity;//name -> ascii, name * age % size
+		if(ascii)
+			index = asciiHash(x);
+		else
+			index = djb2Hash(x);
 
 		//check if index place is empty(add or check next) (extend vector if needed)
 		if(t[index] == nullptr){
@@ -147,13 +156,16 @@ public:
 		}
 		t.resize(nextPrime(t.capacity()));
 		capacity = t.capacity();
-
+		cout << "Rehashing gave new size: " << t.capacity() << endl;
 		for (int i = 0; i < tempArray.size(); i++) {
 			string name = tempArray[i]->getName();
 			int age = tempArray[i]->getAge();			
+			int index;
 
-			int index = asciiHash(x);
-			//int index = djb2Hash(x);
+			if(ascii)
+				index = asciiHash(x);
+			else
+				index = djb2Hash(x);
 			
 
 			if (t[index] == nullptr) {
