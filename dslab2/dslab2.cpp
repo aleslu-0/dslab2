@@ -1,5 +1,4 @@
 #include "dslab2.h"
-#include "dslab2second.h"
 #include <ctime>
 #include <chrono>
 using namespace std;
