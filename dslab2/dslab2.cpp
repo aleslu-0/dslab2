@@ -1,4 +1,5 @@
 #include "dslab2.h"
+#include "dslab2second.h"
 #include <ctime>
 #include <chrono>
 using namespace std;
@@ -30,7 +31,7 @@ void linear(int i) {
 }
 void hopscotch(int i) {
     srand(time(0));
-    HopScotchTable t(i);
+    HopScotchTable h(i);
     int flex = 0;
     high_resolution_clock::duration totalTime(0);
     auto start = high_resolution_clock::now();
@@ -39,15 +40,15 @@ void hopscotch(int i) {
         int randn = rand() % (1000 - 100) + 100; //numbers between 100 and 999
         string bruh = to_string(randn);
         flex = i;
-        t.addObject(bruh, flex);
+        h.addObject(bruh, flex);
     }
 
     auto end = high_resolution_clock::now();
     totalTime = totalTime + (end - start);
 
-    //t.displayTable(); //bruh, flex, iteration
-    cout << "\n-Using linear probing with " << t.getSize() << " items-";
-    cout << "\nNumber of collisions: " << t.getTotalCol() << "\nLength of longest collision chain: " << t.getColChain();
+    //h.displayTable(); //bruh, flex, iteration
+    cout << "\n-Using linear probing with " << h.getSize() << " items-";
+    cout << "\nNumber of collisions: " << h.getTotalCol() << "\nLength of longest collision chain: " << h.getColChain();
     cout << "\nTotal time elapsed: " << totalTime.count() << " nanoseconds\n\n";
     //cout << t.getSize() << " and " << t.getTableSize() << endl;
     //cout << t.getPercentage() << endl;

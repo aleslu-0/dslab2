@@ -23,5 +23,8 @@
     <ClInclude Include="dslab2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dslab2second.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
