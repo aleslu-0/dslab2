@@ -235,7 +235,7 @@ public:
 
 		if (t[index]->getObj() == nullptr) { //>:C
 			t[index]->setObj(oHolder);
-			oHolder->setHomeNode(chain);
+			oHolder->setHomeNode(index);//ändrade chain till -> index
 			//t[index]->setBtm(bHolder);/////////////////////?
 			//cout << index  << endl;
 			t[index]->getBtm().setElement(1, chain);
@@ -243,12 +243,12 @@ public:
 		}
 
 		else {
-			oHolder->setHomeNode(chain);
+			oHolder->setHomeNode(index);//ändrade chain till -> index
 			//chain++;
 
 			for (int i = 0; i < h; i++) {
 
-				if (index + i > capacity - 1) {
+				if (index + i >= capacity) {
 					index = outOfBounds(index + i);
 				}
 
@@ -256,7 +256,7 @@ public:
 					t[index + i]->setObj(oHolder);
 					//t[index]->setBtm(bHolder);/////////////////////?
 					//cout << index << endl;
-					t[index + i]->getBtm().setElement(1, chain);//hm
+					t[index]->getBtm().setElement(1, chain);
 					size++;
 					foundPlace = true;
 					break;//breaks if it finds a slot
@@ -267,20 +267,78 @@ public:
 					collisionChain = chain;
 				}
 			}
+
+			//if(!foundPlace){
+			//	int freePosition = findNextEmpty(index);//change position to index
+			//	/*Object* moveCandidate = nullptr;
+			//	moveCandidate->setHomeNode(index);*/
+			//	int moveCandidateOffset = -1;
+
+			//	int index2 = 0;
+			//	for (int i = 3; i > 0; i--)
+			//	{
+			//		if (index - i < 0)
+			//		{
+			//			index2 = (capacity) + (index - i);//change m_capacity to capacity
+			//		}
+			//		else
+			//		{
+			//			index2 = index - i;
+			//		}
+			//		if (t[index2] != nullptr)//change m_hashtable to t
+			//		{
+			//			moveCandidateOffset = t[index2]->getBtm().getElement(3 - i);//changed check to get
+			//		}
+			//		if (moveCandidateOffset != -1)
+			//		{
+			//			cout << "this sucks: " << freePosition << "with i: " << freePosition - i << endl;
+			//			t[oHolder->getHomeNode()]->getBtm().setElement(false, freePosition - i); //freePosition needs to be between 0-3 but is fucking 23 wtf man
+			//			oHolder = t[freePosition - i]->getObj();
+			//			t[freePosition - i]->setObj(nullptr);
+
+			//			break;
+			//		}
+
+			//	}
+
+			//	if (moveCandidateOffset == -1)
+			//	{
+			//		std::cout << "HopScotch Fails - Rehashing " << std::endl;
+			//		addObject(oHolder);//change hopscotchinsert to addobject
+			//		reHash(x, y);
+			//	}
+			//	else
+			//	{
+			//		int count = 0;
+			//		for (int i = 0; i < 3; i++)
+			//		{
+			//			//if (m_hashTable[userKey->GetHomeNode() + x]->GetObject() == userKey)
+			//			if (t[oHolder->getHomeNode() + i]->getObj() == oHolder)
+			//			{
+			//				break;
+			//			}
+			//			count += 1;
+			//		}
+			//		t[index]->getBtm().setElement(true, (count)); 
+			//		addObject(oHolder);
+			//		addObject(oHolder);
+			//	}
+			//}
+			
 			if (!foundPlace) {
 				if (t[index]->getBtm().getAllTrue()) {
 					reHash(x, y);
 				}
 				for (int i = 0; i < h; i++) {
 					if (index + i > capacity - 1) {
-						index = outOfBounds(index + i);
+						index = outOfBounds(index + i);//kanske sätt index = 0?
 					}
-					if (t[index]->getBtm().getElement(i) == true) {
+					if (t[index]->getBtm().getElement(i) == true) {//checks if empty after confirming its full bruh
 						if (t[index + i]->getObj() == nullptr) {
 							t[index + i]->setObj(oHolder);
 							//t[index]->setBtm(bHolder);/////////////////////?
 							//cout << index << endl;
-							t[index + i]->getBtm().setElement(1, chain);//hm
+							t[index]->getBtm().setElement(1, chain);
 							size++;
 							break;
 						}
@@ -290,8 +348,18 @@ public:
 						}
 					}
 				}
-
 			}
+		}
+	}
+	int findNextEmpty(int index) {
+		while (true) {
+			if (index >= capacity) {
+				index = 0;
+			}
+			if (t[index]->getObj() == nullptr) {
+				return index;
+			}
+			index++;
 		}
 	}
 	int outOfBounds(int i) {
@@ -319,7 +387,7 @@ public:
 		vector<Node*> tempArray;
 
 		for (int i = 0; i < capacity; i++) {
-			if (t[i] != nullptr) {
+			if (t[i]->getObj() != nullptr) {//node->obj
 				tempArray.push_back(t[i]);
 				t[i] = nullptr;
 			}
@@ -378,16 +446,15 @@ public:
 			index = djb2Hash(BABE->getName());
 
 		bool foundPlace = false;
-		if (t[index] == nullptr) {
+		if (t[index]->getObj() == nullptr) {//changed added ->getobj()
 			t[index]->setObj(BABE);
-			BABE->setHomeNode(chain);
+			BABE->setHomeNode(index);//ändrade chain till -> index
 			t[index]->getBtm().setElement(1, chain);
 			size++;
 		}
-
 		else {
-			BABE->setHomeNode(chain);
-			chain++;
+			BABE->setHomeNode(index);//ändrade chain till -> index
+			//chain++;
 
 			for (int i = 0; i < h; i++) {
 
@@ -395,9 +462,9 @@ public:
 					index = outOfBounds(index + i);/////////////////////////////
 				}
 
-				if (t[index + i] == nullptr) {///////////////////////////////
+				if (t[index + i]->getObj() == nullptr) {/////////////////////////////////changed added ->getobj()
 					t[index + i]->setObj(BABE);
-					t[index + i]->getBtm().setElement(1, chain);//hm
+					t[index]->getBtm().setElement(1, chain);
 					size++;
 					foundPlace = true;
 					break;//breaks if it finds a slot
@@ -408,6 +475,60 @@ public:
 					collisionChain = chain;
 				}
 			}
+			//if(!foundPlace){
+			//	int freePosition = findNextEmpty(index);//change position to index
+			//	//Object* moveCandidate = nullptr;
+			//	//moveCandidate->setHomeNode(index);
+			//	int moveCandidateOffset = -1;
+
+			//	int index2 = 0;
+			//	for (int i = 3; i > 0; i--)
+			//	{
+			//		if (index - i < 0)
+			//		{
+			//			index2 = (capacity) + (index - i);//change m_capacity to capacity
+			//		}
+			//		else
+			//		{
+			//			index2 = index - i;
+			//		}
+			//		if (t[index2] != nullptr)//change m_hashtable to t
+			//		{
+			//			moveCandidateOffset = t[index2]->getBtm().getElement(3 - i);//changed check to get
+			//		}
+			//		if (moveCandidateOffset != -1)
+			//		{
+			//			t[BABE->getHomeNode()]->getBtm().setElement(false, freePosition - i);
+			//			BABE = t[freePosition - i]->getObj();
+			//			t[freePosition - i]->setObj(nullptr);
+
+			//			break;
+			//		}
+
+			//	}
+
+			//	if (moveCandidateOffset == -1)
+			//	{
+			//		std::cout << "HopScotch Fails - Rehashing " << std::endl;
+			//		addObject(BABE);//change hopscotchinsert to addobject
+			//		reHash(BABE->getName(), BABE->getAge());
+			//	}
+			//	else
+			//	{
+			//		int count = 0;
+			//		for (int i = 0; i < 4; i++)
+			//		{
+			//			//if (m_hashTable[userKey->GetHomeNode() + x]->GetObject() == userKey)
+			//			if (t[BABE->getHomeNode() + i]->getObj() == BABE)
+			//			{
+			//				break;
+			//			}
+			//			count += 1;
+			//		}
+			//		t[index]->getBtm().setElement(true, (count));
+			//		addObject(BABE);
+			//	}
+			//}
 			if (!foundPlace) {
 				if (t[index]->getBtm().getAllTrue() == true) {
 					reHash(BABE->getName(), BABE->getAge());
@@ -419,7 +540,7 @@ public:
 					if (t[index]->getBtm().getElement(i) == true) {
 						if (t[index + i] == nullptr) {///////////////////////////
 							t[index + i]->setObj(BABE);
-							t[index + i]->getBtm().setElement(1, chain);//hm
+							t[index]->getBtm().setElement(1, chain);
 							size++;
 							break;
 						}
@@ -455,7 +576,7 @@ public:
 
 	void displayTable() {
 		for (int i = 0; i < t.capacity(); i++) {
-			if (t[i] != nullptr)
+			if (t[i]->getObj() != nullptr)//changed added ->getobj()
 				cout << t[i]->getObj()->getName() << " " << t[i]->getObj()->getAge() << " " << i << endl;
 		}
 	}

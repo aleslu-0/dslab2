@@ -3,6 +3,35 @@
 #include <string>
 
 using namespace std;
+class Object {
+private:
+	string name;
+	int age;
+	int homeNode;
+public:
+	Object(string x, int y) {
+		name = x;
+		age = y;
+	}
+	string getName() {
+		return(name);
+	}
+	int getAge() {
+		return(age);
+	}
+	void setName(string x) {
+		name = x;
+	}
+	void setAge(int x) {
+		age = x;
+	}
+	int getHomeNode() {
+		return(homeNode);
+	}
+	void setHomeNode(int x) {
+		homeNode = x;
+	}
+};
 
 class BitMap {
 private:
@@ -65,33 +94,4 @@ public:
 	}
 };
 
-class Object {
-private:
-	string name;
-	int age;
-	int homeNode;
-public:
-	Object(string x, int y) {
-		name = x;
-		age = y;
-	}
-	string getName() {
-		return(name);
-	}
-	int getAge() {
-		return(age);
-	}
-	void setName(string x) {
-		name = x;
-	}
-	void setAge(int x) {
-		age = x;
-	}
-	int getHomeNode() {
-		return(homeNode);
-	}
-	void setHomeNode(int x) {
-		homeNode = x;
-	}
-};
 

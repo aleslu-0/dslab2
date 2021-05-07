@@ -45,7 +45,7 @@ void hopscotch(int i) {
     auto end = high_resolution_clock::now();
     totalTime = totalTime + (end - start);
 
-    //h.displayTable(); //bruh, flex, iteration
+    h.displayTable(); //bruh, flex, iteration
     cout << "\n-Using linear probing with " << h.getSize() << " items-";
     cout << "\nNumber of collisions: " << h.getTotalCol() << "\nLength of longest collision chain: " << h.getColChain();
     cout << "\nTotal time elapsed: " << totalTime.count() << " nanoseconds\n\n";
