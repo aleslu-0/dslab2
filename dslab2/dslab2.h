@@ -14,7 +14,7 @@ private:
 	int size;
 	int collision;
 	int collisionChain;
-	bool ascii;
+	bool sdbm;
 public:
 	LinearTable(int enc) {
 		t.resize(11);
@@ -25,10 +25,10 @@ public:
 		for(int i = 0; i < 11; i++){
 			t[i] = nullptr;
 		}
-		ascii = enc;
+		sdbm = enc;
 	};
 	bool getAscii() {
-		return ascii;
+		return sdbm;
 	}
 	int getTableSize() {
 		return capacity;
@@ -51,7 +51,7 @@ public:
 		if ((float(size) / float(capacity)) >= float(0.6)) {		
 			reHash(x);
 		}
-		if(ascii)
+		if(sdbm)
 			index = asciiHash(x);
 		else
 			index = djb2Hash(x);
@@ -138,7 +138,7 @@ public:
 			int age = tempArray[i]->getAge();			
 			int index;
 
-			if(ascii)
+			if(sdbm)
 				index = asciiHash(x);
 			else
 				index = djb2Hash(x);
@@ -186,7 +186,7 @@ private:
 	int collision;
 	int collisionChain;
 	int h;
-	bool ascii;
+	bool sdbm;
 public:
 	HopScotchTable(int enc) {
 		t.resize(11);
@@ -195,7 +195,7 @@ public:
 		collision = 0;
 		collisionChain = 0;
 		capacity = t.capacity();
-		ascii = enc;
+		sdbm = enc;
 		for (int i = 0; i < capacity; i++) {
 			Node* holder = new Node();
 			t[i] = holder;
@@ -226,8 +226,8 @@ public:
 		if ((float(size) / float(capacity)) >= float(0.6)) {
 			reHash(x, y);
 		}
-		if (ascii)
-			index = asciiHash(x);
+		if (sdbm)
+			index = sdbmHash(x);
 		else
 			index = djb2Hash(x);
 
@@ -268,93 +268,75 @@ public:
 				}
 			}
 
-			//if(!foundPlace){
-			//	int freePosition = findNextEmpty(index);//change position to index
-			//	/*Object* moveCandidate = nullptr;
-			//	moveCandidate->setHomeNode(index);*/
-			//	int moveCandidateOffset = -1;
+			if(!foundPlace){
+				int freePosition = findNextEmpty(index);//change position to index
+				Object* moveCandidate = nullptr;
+				//moveCandidate->setHomeNode(index);
+				int moveCandidateOffset = -1;
 
-			//	int index2 = 0;
-			//	for (int i = 3; i > 0; i--)
-			//	{
-			//		if (index - i < 0)
-			//		{
-			//			index2 = (capacity) + (index - i);//change m_capacity to capacity
-			//		}
-			//		else
-			//		{
-			//			index2 = index - i;
-			//		}
-			//		if (t[index2] != nullptr)//change m_hashtable to t
-			//		{
-			//			moveCandidateOffset = t[index2]->getBtm().getElement(3 - i);//changed check to get
-			//		}
-			//		if (moveCandidateOffset != -1)
-			//		{
-			//			cout << "this sucks: " << freePosition << "with i: " << freePosition - i << endl;
-			//			t[oHolder->getHomeNode()]->getBtm().setElement(false, freePosition - i); //freePosition needs to be between 0-3 but is fucking 23 wtf man
-			//			oHolder = t[freePosition - i]->getObj();
-			//			t[freePosition - i]->setObj(nullptr);
+				int index2 = 0;
+				for (int i = 3; i > 0; i--)
+				{
+					if (index - i < 0)
+					{
+						
+						index2 = (capacity) + (index - i);//change m_capacity to capacity
+					}
+					else
+					{
+						index2 = index - i;
+					}
+					if (t[index2] != nullptr)//change m_hashtable to t
+					{
+						//moveCandidateOffset = t[index2]->getBtm().getElement(3 - i);//changed check to get
+						moveCandidateOffset = t[index2]->getBtm().getFirstTrue(3-i);
+					}
+					if (moveCandidateOffset != -1)
+					{
+						
+						moveCandidate = t[index2]->getObj();
+						t[index2]->setObj(nullptr);
+						t[moveCandidate->getHomeNode()]->getBtm().setElement(false, moveCandidateOffset); //freePosition needs to be between 0-3 but is way over
+						break;
+					}
 
-			//			break;
-			//		}
+				}
 
-			//	}
-
-			//	if (moveCandidateOffset == -1)
-			//	{
-			//		std::cout << "HopScotch Fails - Rehashing " << std::endl;
-			//		addObject(oHolder);//change hopscotchinsert to addobject
-			//		reHash(x, y);
-			//	}
-			//	else
-			//	{
-			//		int count = 0;
-			//		for (int i = 0; i < 3; i++)
-			//		{
-			//			//if (m_hashTable[userKey->GetHomeNode() + x]->GetObject() == userKey)
-			//			if (t[oHolder->getHomeNode() + i]->getObj() == oHolder)
-			//			{
-			//				break;
-			//			}
-			//			count += 1;
-			//		}
-			//		t[index]->getBtm().setElement(true, (count)); 
-			//		addObject(oHolder);
-			//		addObject(oHolder);
-			//	}
-			//}
-			
-			if (!foundPlace) {
-				if (t[index]->getBtm().getAllTrue()) {
+				if (moveCandidateOffset == -1)
+				{
+					cout << "HopScotch Fails - Rehashing " << std::endl;
+					addObject(oHolder);//change hopscotchinsert to addobject
 					reHash(x, y);
 				}
-				for (int i = 0; i < h; i++) {
-					if (index + i > capacity - 1) {
-						index = outOfBounds(index + i);//kanske sätt index = 0?
-					}
-					if (t[index]->getBtm().getElement(i) == true) {//checks if empty after confirming its full bruh
-						if (t[index + i]->getObj() == nullptr) {
-							t[index + i]->setObj(oHolder);
-							//t[index]->setBtm(bHolder);/////////////////////?
-							//cout << index << endl;
-							t[index]->getBtm().setElement(1, chain);
-							size++;
+				else
+				{
+					int count = 0;
+					for (int i = 0; i < 3; i++)
+					{
+						//if (m_hashTable[userKey->GetHomeNode() + x]->GetObject() == userKey)
+						
+						if (t[index + i]->getObj() == oHolder)
+						{
 							break;
-						}
-						else {
-							addObject(t[index + i]->getObj()->getName(), t[index + i]->getObj()->getAge());
-							addObject(x, y);
-						}
+						}		
+						
+						count += 1;
 					}
+					t[index]->getBtm().setElement(true, (count)); 
+					addObject(moveCandidate); //crashes if oHolder is null
+					addObject(oHolder);
 				}
 			}
+			
 		}
 	}
 	int findNextEmpty(int index) {
 		while (true) {
+			if (index <= 2) {
+				index = 3;
+			}
 			if (index >= capacity) {
-				index = 0;
+				index = 3;
 			}
 			if (t[index]->getObj() == nullptr) {
 				return index;
@@ -362,6 +344,28 @@ public:
 			index++;
 		}
 	}
+
+	int FindNextEmpty2(int x)
+	{
+		int position = x;
+		int index = 0;
+
+		while (t[position]->getObj() != nullptr)
+		{
+			if (position == capacity - 1)
+			{
+				position = 0;
+			}
+			else
+			{
+				position++;
+			}
+		}
+
+		return position;
+	}
+
+
 	int outOfBounds(int i) {
 		int reset = 0;
 		reset = i - capacity;
@@ -406,32 +410,6 @@ public:
 		for (int i = 0; i < tempArray.size(); i++) {
 			addObject(tempArray[i]->getObj());
 		}
-
-		//for (int i = 0; i < tempArray.size(); i++) {
-		//	int index;
-
-		//	if(ascii)
-		//		index = asciiHash(x);
-		//	else
-		//		index = djb2Hash(x);
-		//	
-
-		//	if (t[index]->getObj() == nullptr) {
-		//		
-		//		//t[index] = addObject(tempArray[i]->getObj());
-		//		t[index]->setObj(tempArray[i]->getObj());
-		//	}
-		//	else {
-		//		for (int b = index + 1; b < capacity; b++) {
-		//			if (t[b]->getObj() == nullptr) {
-		//				
-		//				//t[b] = addObject(tempArray[i]->getObj());
-		//				t[b]->setObj(tempArray[i]->getObj());
-		//				break;
-		//			}
-		//		}
-		//	}
-		//}
 	}
 
 	Node* addObject(Object* BABE) {
@@ -440,8 +418,8 @@ public:
 		if ((float(size) / float(capacity)) >= float(0.6)) {
 			reHash(BABE->getName(), BABE->getAge());
 		}
-		if (ascii)//this shit fucked
-			index = asciiHash(BABE->getName());
+		if (sdbm)//this shit fucked
+			index = sdbmHash(BABE->getName());
 		else
 			index = djb2Hash(BABE->getName());
 
@@ -475,60 +453,7 @@ public:
 					collisionChain = chain;
 				}
 			}
-			//if(!foundPlace){
-			//	int freePosition = findNextEmpty(index);//change position to index
-			//	//Object* moveCandidate = nullptr;
-			//	//moveCandidate->setHomeNode(index);
-			//	int moveCandidateOffset = -1;
-
-			//	int index2 = 0;
-			//	for (int i = 3; i > 0; i--)
-			//	{
-			//		if (index - i < 0)
-			//		{
-			//			index2 = (capacity) + (index - i);//change m_capacity to capacity
-			//		}
-			//		else
-			//		{
-			//			index2 = index - i;
-			//		}
-			//		if (t[index2] != nullptr)//change m_hashtable to t
-			//		{
-			//			moveCandidateOffset = t[index2]->getBtm().getElement(3 - i);//changed check to get
-			//		}
-			//		if (moveCandidateOffset != -1)
-			//		{
-			//			t[BABE->getHomeNode()]->getBtm().setElement(false, freePosition - i);
-			//			BABE = t[freePosition - i]->getObj();
-			//			t[freePosition - i]->setObj(nullptr);
-
-			//			break;
-			//		}
-
-			//	}
-
-			//	if (moveCandidateOffset == -1)
-			//	{
-			//		std::cout << "HopScotch Fails - Rehashing " << std::endl;
-			//		addObject(BABE);//change hopscotchinsert to addobject
-			//		reHash(BABE->getName(), BABE->getAge());
-			//	}
-			//	else
-			//	{
-			//		int count = 0;
-			//		for (int i = 0; i < 4; i++)
-			//		{
-			//			//if (m_hashTable[userKey->GetHomeNode() + x]->GetObject() == userKey)
-			//			if (t[BABE->getHomeNode() + i]->getObj() == BABE)
-			//			{
-			//				break;
-			//			}
-			//			count += 1;
-			//		}
-			//		t[index]->getBtm().setElement(true, (count));
-			//		addObject(BABE);
-			//	}
-			//}
+			
 			if (!foundPlace) {
 				if (t[index]->getBtm().getAllTrue() == true) {
 					reHash(BABE->getName(), BABE->getAge());
@@ -556,13 +481,23 @@ public:
 		return t[index];
 	}
 
-	int asciiHash(string x) {
-		int temp = 0;
-		for (int i = 0; i < x.size(); i++) {
-			temp = temp + int(x[i]);
+	unsigned int sdbmHash(string input)
+	{
+		int hash = 0;
+		unsigned int i = 0;
+		unsigned int len = input.length();
+
+		for (i = 0; i < len; i++)
+		{
+			hash = (input[i]) + (hash << 6) + (hash << 16) - hash;
 		}
-		int index = (temp) % capacity;//name -> ascii, name * age % size
-		return index;
+
+		int position = hash % capacity;
+		if (position < 0)
+		{
+			return (-position);
+		}
+		return position;
 	}
 
 	int djb2Hash(string x) {

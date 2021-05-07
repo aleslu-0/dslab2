@@ -7,15 +7,13 @@ using namespace std::chrono;
 void linear(int i) {
     srand(time(0));
     LinearTable t(i);
-    int flex = 0;
     high_resolution_clock::duration totalTime(0);
     auto start = high_resolution_clock::now();
 
     for (int i = 0; i < 10000; i++) {
         int randn = rand() % (1000 - 100) + 100; //numbers between 100 and 999
         string bruh = to_string(randn);
-        flex = i;
-        t.addObject(bruh, flex);       
+        t.addObject(bruh, i);       
     }
 
     auto end = high_resolution_clock::now();
@@ -31,22 +29,23 @@ void linear(int i) {
 void hopscotch(int i) {
     srand(time(0));
     HopScotchTable h(i);
-    int flex = 0;
     high_resolution_clock::duration totalTime(0);
     auto start = high_resolution_clock::now();
 
     for (int i = 0; i < 10000; i++) {
-        int randn = rand() % (1000 - 100) + 100; //numbers between 100 and 999
-        string bruh = to_string(randn);
-        flex = i;
-        h.addObject(bruh, flex);
+        
+        std::string extra = std::to_string(rand());
+		std::string name = std::to_string(rand()) + extra;
+        //int randn = rand() % (1000 - 100) + 100; //numbers between 100 and 999
+        //string name = to_string(randn);
+        h.addObject(name, i);
     }
 
     auto end = high_resolution_clock::now();
     totalTime = totalTime + (end - start);
 
-    h.displayTable(); //bruh, flex, iteration
-    cout << "\n-Using linear probing with " << h.getSize() << " items-";
+    //h.displayTable(); //bruh, flex, iteration
+    cout << "\n-Using hopscotch hashing with 10000" << " items-";
     cout << "\nNumber of collisions: " << h.getTotalCol() << "\nLength of longest collision chain: " << h.getColChain();
     cout << "\nTotal time elapsed: " << totalTime.count() << " nanoseconds\n\n";
     //cout << t.getSize() << " and " << t.getTableSize() << endl;
@@ -68,20 +67,20 @@ int main()
             if (enc == 1 || enc == 0)
                 linear(enc);
             else
-                cout << "No";
+                cout << "Invalid";
 
         }
         break;
 
         case 0:
         {
-            cout << "Hopscotch chosen. Ascii or djb2 encoding? (1/0)\n";
+            cout << "Hopscotch chosen. Sdbm or djb2 encoding? (1/0)\n";
             int enc;
             cin >> enc;
             if (enc == 1 || enc == 0)
                 hopscotch(enc);
             else
-                cout << "No";
+                cout << "Invalid";
         }
         break;
 

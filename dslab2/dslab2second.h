@@ -48,8 +48,8 @@ public:
 	bool getElement(int i) {
 		return bits[i];
 	}
-	int getFirstTrue() {
-		for (int i = 0; i < 4; i++) {
+	int getFirstTrue(int x) {
+		for (int i = 0; i < x; i++) {
 			if (bits[i]) {
 				return i;
 			}
