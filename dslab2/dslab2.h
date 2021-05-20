@@ -123,7 +123,7 @@ public:
 	}
 
 	void reHash(string x){
-		vector<Object*> tempArray;//are we suppose to use a temporrary array while moving the objects back into the original array?
+		vector<Object*> tempArray;
 		for (int i = 0; i < capacity; i++) {
 			if (t[i] != nullptr) {
 				tempArray.push_back(t[i]);
@@ -304,8 +304,9 @@ public:
 
 				if (moveCandidateOffset == -1)
 				{
-					cout << "HopScotch Fails - Rehashing " << std::endl;
-					addObject(oHolder);//change hopscotchinsert to addobject
+					//cout << "Rehashing" << endl;
+					//addObject(oHolder);//change hopscotchinsert to addobject
+					t[freePosition]->setObj(oHolder);
 					reHash(x, y);
 				}
 				else
@@ -313,7 +314,6 @@ public:
 					int count = 0;
 					for (int i = 0; i < 3; i++)
 					{
-						//if (m_hashTable[userKey->GetHomeNode() + x]->GetObject() == userKey)
 						
 						if (t[index + i]->getObj() == oHolder)
 						{
@@ -323,7 +323,7 @@ public:
 						count += 1;
 					}
 					t[index]->getBtm().setElement(true, (count)); 
-					addObject(moveCandidate); //crashes if oHolder is null
+					addObject(moveCandidate); 
 					addObject(oHolder);
 				}
 			}
@@ -345,7 +345,7 @@ public:
 		}
 	}
 
-	int FindNextEmpty2(int x)
+	int findNextEmpty2(int x)
 	{
 		int position = x;
 		int index = 0;
